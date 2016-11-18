@@ -6,12 +6,10 @@ public class ContainerSwift : Resolver {
         // create record
         list[Index(type: t)] = Value<T>(creator: creator)
     }
-    
-    typealias FactoryType = (Resolver) -> T
 
     public func resolve<T>(_ t: T.Type) -> T? {
         return resolveInternal(index: Index(type: t)) {
-            (creator: FactoryType) in creator(self)
+            (creator: (Resolver) -> T) in creator(self)
         }
     }
     
