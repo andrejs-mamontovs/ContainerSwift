@@ -13,6 +13,6 @@ var container = Container()
 
 container.register(AP.self, creator: { _ in A()})
 
-var instance = container.resolve(AP.self)!
+var instance = container.resolve(AP.self)
 
 ```

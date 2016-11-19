@@ -7,13 +7,13 @@ public class ContainerSwift : Resolver {
         list[Index(type: t)] = Value<T>(creator: creator)
     }
 
-    public func resolve<T>(_ t: T.Type) -> T? {
+    public func resolve<T>(_ t: T.Type) -> T {
         return resolveInternal(index: Index(type: t)) {
             (creator: (Resolver) -> T) in creator(self)
         }
     }
     
-    func resolveInternal<T, F>(index: Index, caller: (F)-> T) -> T? {
+    func resolveInternal<T, F>(index: Index, caller: (F)-> T) -> T {
         // cast value
         let v = list[index] as? Value<T>
         return caller(v?.creator as! F)
@@ -50,5 +50,5 @@ public class Value<T> {
 }
 
 public protocol Resolver {   
-    func resolve<T>(_ t: T.Type) -> T?
+    func resolve<T>(_ t: T.Type) -> T
 }

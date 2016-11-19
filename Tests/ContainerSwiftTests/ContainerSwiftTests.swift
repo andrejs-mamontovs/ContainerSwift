@@ -8,7 +8,7 @@ class ContainerSwiftTests: XCTestCase {
         let container = ContainerSwift();
         container.register(A.self) {_ in A(name: "Simple Test")}
 
-        let a = container.resolve(A.self)!
+        let a = container.resolve(A.self)
         XCTAssertEqual(a.name, "Simple Test")
     }
 
