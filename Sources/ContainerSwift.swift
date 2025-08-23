@@ -2,7 +2,7 @@ public class ContainerSwift : Resolver {
 
     var list = [Index: Any]()
     
-    public func register<T>(_ t: T.Type, creator:(Resolver) -> T) {
+    public func register<T>(_ t: T.Type, creator: @escaping (Resolver) -> T) {
         // create record
         list[Index(type: t)] = Value<T>(creator: creator)
     }
@@ -26,12 +26,11 @@ public class ContainerSwift : Resolver {
         public init(type: FunctionType.Type) {
             self.type = type;
         }
-        
-        public var hashValue: Int {
-            get {
-                return String(describing: type).hashValue
-            }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(ObjectIdentifier(type))
         }
+        
         public static func ==(lhs: Index, rhs: Index) -> Bool {
             return lhs.type == rhs.type;
         }
@@ -42,9 +41,9 @@ typealias FunctionType = Any
 
 public class Value<T> {
     
-    let creator: FunctionType
+    let creator: (Resolver) -> T
     
-    init(creator: FunctionType) {
+    init(creator: @escaping (Resolver) -> T) {
         self.creator = creator
     }
 }
