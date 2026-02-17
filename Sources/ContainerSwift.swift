@@ -1,53 +1,46 @@
-public class ContainerSwift : Resolver {
+public class ContainerSwift: Resolver {
 
     var list = [Index: Any]()
-    
-    public func register<T>(_ t: T.Type, creator: @escaping (Resolver) -> T) {
-        // create record
+
+    public func register<T>(_ t: T.Type, creator: @escaping (any Resolver) -> T) {
         list[Index(type: t)] = Value<T>(creator: creator)
     }
 
     public func resolve<T>(_ t: T.Type) -> T {
-        return resolveInternal(index: Index(type: t)) {
-            (creator: (Resolver) -> T) in creator(self)
+        let index = Index(type: t)
+        guard let value = list[index] as? Value<T> else {
+            fatalError("No registration found for type \(String(describing: t))")
         }
+        return value.creator(self)
     }
-    
-    func resolveInternal<T, F>(index: Index, caller: (F)-> T) -> T {
-        // cast value
-        let v = list[index] as? Value<T>
-        return caller(v?.creator as! F)
-    }
-    
-    class Index : Hashable, Equatable {
-        
-        let type : FunctionType.Type;
-        
-        public init(type: FunctionType.Type) {
-            self.type = type;
+
+    class Index: Hashable {
+
+        let type: Any.Type
+
+        init(type: Any.Type) {
+            self.type = type
         }
 
         func hash(into hasher: inout Hasher) {
             hasher.combine(ObjectIdentifier(type))
         }
-        
-        public static func ==(lhs: Index, rhs: Index) -> Bool {
-            return lhs.type == rhs.type;
+
+        static func == (lhs: Index, rhs: Index) -> Bool {
+            lhs.type == rhs.type
         }
     }
 }
 
-typealias FunctionType = Any
-
 public class Value<T> {
-    
-    let creator: (Resolver) -> T
-    
-    init(creator: @escaping (Resolver) -> T) {
+
+    let creator: (any Resolver) -> T
+
+    init(creator: @escaping (any Resolver) -> T) {
         self.creator = creator
     }
 }
 
-public protocol Resolver {   
+public protocol Resolver {
     func resolve<T>(_ t: T.Type) -> T
 }
